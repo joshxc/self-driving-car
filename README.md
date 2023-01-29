@@ -1,3 +1,8 @@
-## Self Driving Car using Neural Networks and Machine Learning
+## Self Driving Car using Neural Networks
 
-#### - No Libraries!
+#### - Vanilla JS with no libraries
+
+Links of interest:
+
+- HTML Canvas Reference
+  - https://www.w3schools.com/tags/ref_canvas.asp
