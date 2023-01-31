@@ -36,12 +36,19 @@ function animate(time) {
   for (let i = 0; i < cars.length; i++) {
     cars[i].update(road.borders, traffic);
   }
+
+  // define best car (i.e. the car that survives the longest)
+  // find the car with the minimum y value out of all cars y values
+  const bestCar = cars.find(
+    (car) => car.y == Math.min(...cars.map((car) => car.y))
+  );
+
   // resizing the canvas here will clear existing car positions and only leave 1 box visible
   carCanvas.height = window.innerHeight;
   networkCanvas.height = window.innerHeight;
 
   carCtx.save();
-  carCtx.translate(0, -cars[0].y + carCanvas.height * 0.7);
+  carCtx.translate(0, -bestCar.y + carCanvas.height * 0.7);
 
   road.draw(carCtx);
   for (let i = 0; i < traffic.length; i++) {
@@ -53,12 +60,13 @@ function animate(time) {
     cars[i].draw(carCtx, 'red');
   }
   carCtx.globalAlpha = 1;
+  bestCar.draw(carCtx, 'red', true);
 
   carCtx.restore();
 
   // animate the networkCtx
   networkCtx.lineDashOffset = -time / 100;
-  Visualizer.drawNetwork(networkCtx, cars[0].brain);
+  Visualizer.drawNetwork(networkCtx, bestCar.brain);
 
   // Calls `animate()` repeatedly
   requestAnimationFrame(animate);
