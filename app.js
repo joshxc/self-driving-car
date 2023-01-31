@@ -18,7 +18,11 @@ let bestCar = cars[0];
 if (localStorage.getItem('bestBrain')) {
   bestCar.brain = JSON.parse(localStorage.getItem('bestBrain'));
 }
-const traffic = [new Car(road.getLaneCenter(1), -100, 30, 50, 'BOT', 2)];
+const traffic = [
+  new Car(road.getLaneCenter(1), -100, 30, 50, 'BOT', 2),
+  new Car(road.getLaneCenter(0), -300, 30, 50, 'BOT', 2),
+  new Car(road.getLaneCenter(2), -300, 30, 50, 'BOT', 2),
+];
 
 animate();
 
