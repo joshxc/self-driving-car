@@ -1,7 +1,7 @@
 class Car {
   constructor(x, y, width, height, controlType, maxSpeed = 4) {
     this.x = x;
-    this.y = y; // -y it upward, +y is downward
+    this.y = y; // -y is upward, +y is downward
     this.width = width;
     this.height = height;
 
@@ -12,9 +12,12 @@ class Car {
     this.angle = 0;
     this.damaged = false; // false if car has not crashed
 
+    this.useBrain = controlType == 'AI';
+
     // only show sensors on USER car
     if (controlType != 'BOT') {
       this.sensor = new Sensor(this); // passing the Car object to Sensor
+      this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
     }
     this.controls = new Controls(controlType);
   }
@@ -27,6 +30,20 @@ class Car {
     }
     if (this.sensor) {
       this.sensor.update(roadBorders, traffic);
+      const offsets = this.sensor.readings.map((sens) =>
+        // null = no reading from sensor (neurons receive low values if obstacle is far away)
+        // neurons receive higher values closer to 1 if the obstacle is close
+        sens === null ? 0 : 1 - sens.offset
+      );
+      const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+      // console.log(outputs);
+
+      if (this.useBrain) {
+        this.controls.forward = outputs[0];
+        this.controls.left = outputs[1];
+        this.controls.right = outputs[2];
+        this.controls.reverse = outputs[3];
+      }
     }
   }
 
