@@ -1,5 +1,5 @@
 class Car {
-  constructor(x, y, width, height) {
+  constructor(x, y, width, height, controlType, maxSpeed = 4) {
     this.x = x;
     this.y = y; // -y it upward, +y is downward
     this.width = width;
@@ -7,27 +7,35 @@ class Car {
 
     this.speed = 0;
     this.acceleration = 0.25;
-    this.maxSpeed = 4;
+    this.maxSpeed = maxSpeed;
     this.friction = 0.05;
     this.angle = 0;
     this.damaged = false; // false if car has not crashed
 
-    this.sensor = new Sensor(this); // passing the Car object to Sensor
-    this.controls = new Controls();
+    // only show sensors on USER car
+    if (controlType != 'BOT') {
+      this.sensor = new Sensor(this); // passing the Car object to Sensor
+    }
+    this.controls = new Controls(controlType);
   }
 
-  update(roadBorders) {
+  update(roadBorders, traffic) {
     if (!this.damaged) {
       this.#move();
       this.polygon = this.#createPolygon();
-      this.damaged = this.#assessDamage(roadBorders);
+      this.damaged = this.#assessDamage(roadBorders, traffic);
     }
-    this.sensor.update(roadBorders);
+    if (this.sensor) {
+      this.sensor.update(roadBorders, traffic);
+    }
   }
 
-  #assessDamage(roadBorders) {
+  #assessDamage(roadBorders, traffic) {
     for (let i = 0; i < roadBorders.length; i++) {
       if (polysIntersect(this.polygon, roadBorders[i])) return true;
+    }
+    for (let i = 0; i < traffic.length; i++) {
+      if (polysIntersect(this.polygon, traffic[i].polygon)) return true;
     }
     return false;
   }
@@ -87,8 +95,8 @@ class Car {
     this.y -= Math.cos(this.angle) * this.speed;
   }
 
-  draw(ctx) {
-    ctx.fillStyle = this.damaged ? 'gray' : 'black';
+  draw(ctx, colour) {
+    ctx.fillStyle = this.damaged ? 'black' : colour;
     ctx.beginPath();
     ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
     // starting at 1 because we moved to the first point above
@@ -96,6 +104,8 @@ class Car {
       ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
     }
     ctx.fill();
-    this.sensor.draw(ctx);
+    if (this.sensor) {
+      this.sensor.draw(ctx);
+    }
   }
 }

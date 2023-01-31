@@ -1,12 +1,18 @@
 class Controls {
-  constructor() {
+  constructor(type) {
     this.forward = false;
     this.left = false;
     this.right = false;
     this.reverse = false;
 
-    // # private method - can't access method from outside of Controls class
-    this.#addKeyboardListeners();
+    switch (type) {
+      case 'USER':
+        this.#addKeyboardListeners();
+        break;
+      case 'BOT':
+        this.forward = true;
+        break;
+    }
   }
 
   #addKeyboardListeners() {
