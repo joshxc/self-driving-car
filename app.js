@@ -10,18 +10,28 @@ networkCanvas.width = 400;
 const carCtx = carCanvas.getContext('2d');
 const networkCtx = networkCanvas.getContext('2d');
 const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9);
-// const car = new Car(road.getLaneCenter(1), 100, 30, 50, 'AI');
-const N = 100;
+
+// Modify N to generate more AI cars
+const N = 1;
 const cars = generateCars(N);
 let bestCar = cars[0];
 // set the best brain to the best car
 if (localStorage.getItem('bestBrain')) {
-  bestCar.brain = JSON.parse(localStorage.getItem('bestBrain'));
+  for (let i = 0; i < cars.length; i++) {
+    cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
+    if (i !== 0) {
+      NeuralNetwork.mutate(cars[i].brain, 0.1);
+    }
+  }
 }
 const traffic = [
   new Car(road.getLaneCenter(1), -100, 30, 50, 'BOT', 2),
   new Car(road.getLaneCenter(0), -300, 30, 50, 'BOT', 2),
   new Car(road.getLaneCenter(2), -300, 30, 50, 'BOT', 2),
+  new Car(road.getLaneCenter(0), -500, 30, 50, 'BOT', 2),
+  new Car(road.getLaneCenter(1), -500, 30, 50, 'BOT', 2),
+  new Car(road.getLaneCenter(1), -700, 30, 50, 'BOT', 2),
+  new Car(road.getLaneCenter(2), -700, 30, 50, 'BOT', 2),
 ];
 
 animate();
